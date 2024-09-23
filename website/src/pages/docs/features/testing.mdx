@@ -56,10 +56,10 @@ const executor = buildHTTPExecutor({
 ### Mutation and Query Operations
 
 ```ts filename="Mutation and Query Operations"
-import { parse } from 'graphql'
-import { createSchema, createYoga } from 'graphql-yoga'
-import { buildHTTPExecutor } from '@graphql-tools/executor-http'
-
+import { parse } from 'graphql';
+import { createSchema, createYoga } from 'graphql-yoga';
+import { buildHTTPExecutor } from '@graphql-tools/executor-http';
+ 
 const schema = createSchema({
   typeDefs: /* GraphQL */ `
     type Query {
@@ -71,34 +71,37 @@ const schema = createSchema({
       greetings: () => 'Hello World!'
     }
   }
-})
-
+});
+ 
 function assertSingleValue<TValue extends object>(
   value: TValue | AsyncIterable<TValue>
 ): asserts value is TValue {
   if (Symbol.asyncIterator in value) {
-    throw new Error('Expected single value')
+    throw new Error('Expected single value');
   }
 }
 
+const yoga = createYoga({ schema });
+ 
 const executor = buildHTTPExecutor({
-  fetch: yoga.fetch
-})
-
+  fetch: yoga.fetch,
+  endpoint: `http://yoga/graphql`,
+});
+ 
 const result = await executor({
   document: parse(/* GraphQL */ `
     query {
       greetings
     }
   `)
-})
-
-assertSingleValue(result)
-
+});
+ 
+assertSingleValue(result);
+ 
 console.assert(
   result.data?.greetings === 'Hello World!',
-  `Expected 'Hello World!' but got ${executionResult.data.greetings}`
-)
+  `Expected 'Hello World!' but got ${result.data.greetings}`
+);
 ```
 
 ### Subscription Operations
